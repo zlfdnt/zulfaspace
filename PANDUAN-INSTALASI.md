@@ -38,10 +38,26 @@ Tempel `Kode.gs` terbaru → jalankan `setupAppEnvironment` lagi (aman: membuat 
 
 **Jika muncul error "Specified permissions are not sufficient":** tempel ulang `appsscript.json` terbaru (sudah memuat izin email dan trigger), simpan, jalankan `setupAppEnvironment` lagi, lalu klik *Review permissions → Allow*. Setup juga memasang jadwal otomatis yang merangkum log lebih dari 90 hari menjadi rekap bulanan.
 
-## E. Mengaktifkan Dashboard Admin
-1. Google Cloud Console → buat proyek → APIs & Services → Credentials → **OAuth client ID** (Web application). Pada *Authorized JavaScript origins* isi `https://USERNAME.github.io`. Salin Client ID.
-2. Apps Script → ⚙️ Setelan Proyek → Script Properties → tambah `OAUTH_CLIENT_ID` = Client ID tadi. Pastikan `ADMIN_EMAIL` = email Google Anda (otomatis terisi saat setup; ubah bila perlu).
-3. Lihat nilai `ADMIN_PATH_KEY` di Script Properties. Alamat admin: `https://USERNAME.github.io/zulfaspace/admin.html?k=ISI_ADMIN_PATH_KEY` — simpan di bookmark pribadi, jangan dibagikan.
-4. Deploy ulang Apps Script: Deploy → Manage deployments → ✏️ → Version: New version.
-5. Buka alamat admin → Masuk dengan Google. Akun lain mendapat "Akses ditolak".
-Catatan: unduh Excel berformat CSV (terbuka di Excel); unduh PDF memakai Cetak → Simpan sebagai PDF. Berkas maks 7 MB; untuk yang lebih besar unggah manual ke Drive lalu tempel tautannya.
+## E. Cara masuk ke dashboard (tanpa tombol login di situs publik)
+Dashboard sengaja tidak punya tautan di situs publik. Aksesnya hanya lewat alamat rahasia yang Anda simpan sendiri.
+
+**Persiapan satu kali**
+1. Google Cloud Console → proyek baru → *APIs & Services* → *OAuth consent screen* (External, isi nama aplikasi dan email Anda; tambahkan email Anda di *Test users* bila status masih Testing) → *Credentials* → **Create OAuth client ID** → *Web application*. Pada *Authorized JavaScript origins* isi `https://USERNAME.github.io` (tanpa garis miring di akhir dan tanpa nama repo). Salin Client ID.
+2. Apps Script → ⚙️ Setelan Proyek → Script Properties → tambah `OAUTH_CLIENT_ID` berisi Client ID tadi. Pastikan `ADMIN_EMAIL` berisi email Google yang akan Anda pakai masuk.
+3. Salin nilai `ADMIN_PATH_KEY` dari Script Properties yang sama.
+4. Deploy ulang Apps Script (Deploy → Manage deployments → ✏️ → New version).
+
+**Alamat dashboard Anda**
+`https://USERNAME.github.io/NAMA-REPO/admin.html?k=ISI_ADMIN_PATH_KEY`
+
+**Kiat masuk**
+- Buka alamat itu, klik *Sign in with Google*, pilih akun yang sama dengan `ADMIN_EMAIL`.
+- Simpan alamat lengkap sebagai bookmark atau di pengelola kata sandi. Jangan dibagikan, jangan ditempel di bio atau situs publik.
+- Pakai profil browser yang sudah login ke akun Google tersebut agar tidak salah akun.
+- Sesi berlaku sekitar 2 jam; setelah itu cukup masuk lagi.
+- Jika alamat bocor: Dashboard → Pengaturan → *Ganti alamat rahasia*.
+- "Akses ditolak": kunci `k` salah atau email tidak sama dengan `ADMIN_EMAIL`. Setelah 8 kali gagal, login terkunci 15 menit.
+- Tombol Google tidak muncul / "OAUTH_CLIENT_ID belum diisi": cek langkah 2 dan origin pada langkah 1, lalu deploy ulang.
+
+## F. Yang dikelola dari dashboard
+Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.
