@@ -59,5 +59,12 @@ Dashboard sengaja tidak punya tautan di situs publik. Aksesnya hanya lewat alama
 - "Akses ditolak": kunci `k` salah atau email tidak sama dengan `ADMIN_EMAIL`. Setelah 8 kali gagal, login terkunci 15 menit.
 - Tombol Google tidak muncul / "OAUTH_CLIENT_ID belum diisi": cek langkah 2 dan origin pada langkah 1, lalu deploy ulang.
 
+## E2. Alternatif tanpa Google Cloud: masuk dengan kata sandi
+1. Apps Script → ⚙️ Setelan Proyek → Script Properties → **Add script property**: nama `ADMIN_PASSWORD_BARU`, nilai kata sandi pilihan Anda (minimal 12 karakter, sebaiknya frasa panjang yang unik). Save.
+2. Di editor, pilih fungsi `aturKataSandiAdmin` → ▶ Run. Fungsi ini menyimpan hash kata sandi lalu **menghapus** properti sementara tadi.
+3. Deploy → Manage deployments → ✏️ → New version → Deploy.
+4. Buka `admin.html?k=ADMIN_PATH_KEY` → kolom kata sandi muncul. Untuk mengganti kata sandi, ulangi langkah 1–3.
+Keamanan: akses butuh dua rahasia (kunci pada alamat + kata sandi), kata sandi hanya tersimpan sebagai hash, dan 8 kali gagal mengunci login 15 menit. Login Google tetap lebih kuat karena memakai verifikasi 2 langkah akun Anda; keduanya bisa aktif bersamaan.
+
 ## F. Yang dikelola dari dashboard
 Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.

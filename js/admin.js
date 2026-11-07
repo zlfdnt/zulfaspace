@@ -2,15 +2,20 @@
 const $=s=>document.querySelector(s),GAS=(window.APP_CONFIG||{}).GAS_URL||'',K=new URLSearchParams(location.search).get('k')||'',app=$('#app');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOK=sessionStorage.getItem('zs_t')||'',ST=null,ROWS=[],CUR='';
-if(!K||/GANTI|XXXX/.test(GAS)){app.innerHTML='<div class="box"><h2>Halaman tidak ditemukan</h2></div>';return}
+if(!K){app.innerHTML='<div class="box"><h2>Halaman tidak ditemukan</h2></div>';return}
+if(!/^https:\/\/script\.google\.com\//.test(GAS)||/GANTI|XXXX/.test(GAS)){app.innerHTML='<div class="box"><h2>Backend belum terhubung</h2><p>Isi alamat <b>/exec</b> Apps Script di berkas <b>js/config.js</b>, lalu push ke GitHub.</p></div>';return}
 async function api(action,data){const r=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,token:TOK,data})}),j=await r.json();if(!j.success){if(j.auth)logout();throw new Error(j.message||'Gagal')}return j}
 function toast(m,er){const t=$('#toast');t.textContent=m;t.className='show'+(er?' er':'');setTimeout(()=>t.className='',3200)}
 function logout(){TOK='';sessionStorage.removeItem('zs_t');loginView()}
-async function loginView(){app.innerHTML='<div class="box"><h2>Masuk Admin</h2><p>Gunakan akun Google pemilik situs.</p><div id="gb"></div><p id="lm"></p></div>';
- try{const c=await api('authConfig');if(!c.clientId)throw new Error('OAUTH_CLIENT_ID belum diisi di Script Properties.');
- await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
- google.accounts.id.initialize({client_id:c.clientId,callback:async r=>{try{const j=await api('admin.login',{key:K,credential:r.credential});TOK=j.token;sessionStorage.setItem('zs_t',TOK);start()}catch(e){$('#lm').textContent=e.message}}});
- google.accounts.id.renderButton($('#gb'),{theme:'filled_blue',size:'large',shape:'pill',text:'signin_with'})}catch(e){$('#lm').textContent=e.message}}
+async function loginView(){app.innerHTML='<div class="box"><h2>Masuk Admin</h2><div id="pw"></div><div id="gb"></div><p id="lm"></p></div>';
+ let c={};try{c=await api('authConfig')}catch(e){$('#lm').textContent=e.message;return}
+ const ok=j=>{TOK=j.token;sessionStorage.setItem('zs_t',TOK);start()};
+ if(c.pass){$('#pw').innerHTML='<form id="pf" class="f"><label>Kata sandi<input type="password" id="pi" autocomplete="current-password" required></label><button class="btn pri" style="width:100%">Masuk</button></form>';
+  $('#pf').onsubmit=async e=>{e.preventDefault();try{ok(await api('admin.login',{key:K,password:$('#pi').value}))}catch(x){$('#lm').textContent=x.message}}}
+ if(c.clientId){try{await new Promise((res,no)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=res;s.onerror=no;document.head.appendChild(s)});
+  google.accounts.id.initialize({client_id:c.clientId,callback:async r=>{try{ok(await api('admin.login',{key:K,credential:r.credential}))}catch(e){$('#lm').textContent=e.message}}});
+  google.accounts.id.renderButton($('#gb'),{theme:'filled_blue',size:'large',shape:'pill',text:'signin_with'})}catch(e){$('#lm').textContent='Tombol Google gagal dimuat.'}}
+ if(!c.pass&&!c.clientId)$('#lm').textContent='Belum ada metode masuk. Jalankan aturKataSandiAdmin atau isi OAUTH_CLIENT_ID.'}
 const NAV=[['beranda','🏠 Beranda'],['profil','👤 Profil'],['riwayat','🎓 Riwayat'],['karya','🖼️ Karya'],['pesan','✉️ Pesan Masuk'],['statistik','📊 Statistik & Laporan'],['pengaturan','⚙️ Pengaturan']];
 function start(){app.innerHTML='<aside class="noprint"><b>ZulfaSpace Admin</b>'+NAV.map(n=>`<button data-v="${n[0]}">${n[1]}</button>`).join('')+'<a href="index.html" target="_blank">🌐 Lihat Situs Publik</a><button id="out">Keluar</button></aside><section id="main"></section>';
  app.querySelector('aside').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='out')return logout();show(b.dataset.v)});show('beranda')}
