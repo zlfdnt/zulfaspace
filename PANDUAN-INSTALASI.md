@@ -66,5 +66,14 @@ Dashboard sengaja tidak punya tautan di situs publik. Aksesnya hanya lewat alama
 4. Buka `admin.html?k=ADMIN_PATH_KEY` → kolom kata sandi muncul. Untuk mengganti kata sandi, ulangi langkah 1–3.
 Keamanan: akses butuh dua rahasia (kunci pada alamat + kata sandi), kata sandi hanya tersimpan sebagai hash, dan 8 kali gagal mengunci login 15 menit. Login Google tetap lebih kuat karena memakai verifikasi 2 langkah akun Anda; keduanya bisa aktif bersamaan.
 
+## E3. Unggah materi besar (menu Materi)
+- Menu **Materi** di dashboard: seret & lepas satu atau banyak berkas (PDF, Word, PowerPoint, Excel, ZIP, video, .ggb, .sb3, dan lain-lain, hingga 2 GB per berkas). Browser mengunggah **langsung ke Google Drive** sehingga tidak terbentur batas Apps Script; ada bilah progres per berkas.
+- Setelah terunggah, klik **Ubah** untuk melengkapi judul, mata pelajaran, kelas, dan deskripsi. Centang *Tampilkan di situs* agar muncul di bagian **Materi** pada situs publik.
+- Berkas otomatis memakai akses "siapa pun yang punya tautan" supaya bisa diunduh pengunjung. Jangan unggah dokumen rahasia lewat menu ini. Menghapus materi di dashboard juga memindahkan berkasnya ke Sampah Drive.
+- Berkas lebih dari 25 MB dibuka lewat halaman pratinjau Drive (ada tombol Unduh) karena Drive menampilkan peringatan pemindai virus untuk berkas besar.
+- Jenis yang diizinkan dibatasi (dokumen, arsip, gambar, audio/video, .ggb, .sb3, .py, .ipynb, .json). Berkas yang bisa dijalankan seperti .exe atau .js ditolak.
+- Kuota Drive gratis 15 GB dibagi dengan Gmail dan Foto.
+- Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (membuat sheet **Materi** dan kolom **peran**), lalu Deploy → New version.
+
 ## F. Yang dikelola dari dashboard
 Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.
