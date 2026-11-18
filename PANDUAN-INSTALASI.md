@@ -73,5 +73,12 @@ Keamanan: akses butuh dua rahasia (kunci pada alamat + kata sandi), kata sandi h
 - Jenis yang diizinkan dibatasi (dokumen, arsip, gambar, audio/video, .ggb, .sb3, .py, .ipynb, .json); berkas yang bisa dijalankan seperti .exe atau .js ditolak. Kuota Drive gratis 15 GB dibagi dengan Gmail dan Foto.
 - Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (menambah kolom **berkas** dan **peran**), lalu Deploy → New version.
 
+## E4. Pemberitahuan karya baru & kartu karya
+- Setiap karya yang **baru ditambahkan** lewat dashboard otomatis diberi tanggal. Pengunjung yang pernah datang melihat banner "✨ n karya baru ditambahkan" (tombol *Lihat* membawa mereka ke karya terbaru), kartu baru diberi label **✨ Baru** dan bingkai oranye berdenyut selama 14 hari, serta ikon tab bertitik merah. Pengunjung pertama kali tidak diganggu banner. Banner hilang sendiri setelah daftar karya terlihat 3 detik.
+- Pemberitahuan ini muncul **saat pengunjung membuka situs**. Notifikasi ke pengunjung yang sedang tidak membuka situs (web push) tidak termasuk dan butuh layanan tambahan.
+- Form Karya punya kolom baru: **Subjudul** (garis kecil di atas judul), **Kelas / fase** (lencana kanan atas gambar), dan **Deskripsi** (kartu menampilkan 2 baris; lengkapnya di tombol **Detail**). Tombol **Bagikan** menyalin/membagikan tautan langsung ke karya (`...#karya-ID`).
+- Bagian Pendidikan & Pengalaman kini berupa tab dengan kartu seragam (6 kartu pertama, tombol *Tampilkan semua*); klik kartu untuk membuka detailnya.
+- Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (menambah kolom **kelas, subjudul, dibuat**), lalu Deploy → New version.
+
 ## F. Yang dikelola dari dashboard
 Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.

@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s),GAS=(window.APP_CONFIG||{}).GAS_URL||'',OK=GAS&&!/GANTI|XXXX/.test(GAS);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safe=u=>/^https:\/\//.test(u||'')?u:'';
-let D=window.FALLBACK,J='website',M='Semua';
+let D=window.FALLBACK,J='website',M='Semua',NEWN=0,SEEN=0,NEWL=[],DL=0,RT='pendidikan',RX=false;
 // ---- API (POST wajib text/plain agar tanpa preflight)
 async function api(action,data){const r=await fetch(OK?GAS:'',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})});return r.json()}
 const Q=[];function track(j,t){Q.push({j,t,p:innerWidth<768?'ponsel':innerWidth<1100?'tablet':'laptop'})}
@@ -14,9 +14,10 @@ function slideshow(box,imgs,ms){clearInterval(box._t);box.innerHTML=imgs.map((s,
  const st=()=>box._t=setInterval(()=>go(n+1),ms);st();box.onmouseenter=()=>clearInterval(box._t);box.onmouseleave=st}
 // ---- sampul otomatis (SVG) bila url_gambar_sampul kosong; pisahkan banyak gambar dengan |
 const PAL=[['#7C5CF0','#3BA7F0'],['#FF7A29','#7C5CF0'],['#3BA7F0','#7C5CF0']],SYM={Matematika:['π','∑','△'],Koding:['</>','{ }','▶'],Asesmen:['✓','A+','?']};
-function cover(k){const u=String(k.sampul||'').split('|').map(safe).filter(Boolean);if(u.length)return u;const s=SYM[k.mapel]||['★','✦','◆'],t=esc(String(k.desk||'').slice(0,36));
+function cover(k){const u=String(k.sampul||'').split('|').map(safe).filter(Boolean);if(u.length)return u;
+ const key=Object.keys(SYM).find(x=>String(k.mapel||'').startsWith(x)),ini=String(k.judul||'').split(/\s+/).filter(w=>/^[A-Za-z0-9]/.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'Z',s=key?SYM[key]:[ini,'✦',ini];
  const deco=['<circle cx="270" cy="40" r="70" fill="#fff" opacity=".12"/><circle cx="40" cy="175" r="50" fill="#fff" opacity=".1"/>','<pattern id="d" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="2" fill="#fff" opacity=".35"/></pattern><rect width="320" height="200" fill="url(#d)"/>','<path d="M0 150Q80 100 160 150T320 140V200H0Z" fill="#fff" opacity=".14"/>'];
- return PAL.map((p,i)=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p[i%2]}"/><stop offset="1" stop-color="${p[(i+1)%2]}"/></linearGradient></defs><rect width="320" height="200" fill="url(#g)"/>${deco[i]}<text x="160" y="112" font-size="80" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="800">${esc(s[i])}</text><text x="16" y="184" font-size="13" fill="#fff" font-family="sans-serif" font-weight="600" opacity=".92">${t}</text></svg>`))}
+ return PAL.map((p,i)=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p[i%2]}"/><stop offset="1" stop-color="${p[(i+1)%2]}"/></linearGradient></defs><rect width="320" height="200" fill="url(#g)"/>${deco[i]}<text x="160" y="125" font-size="${s[i].length>2?58:86}" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="800">${esc(s[i])}</text></svg>`))}
 // ---- render
 function render(){const p=D.profil,g=D.pengaturan||{};
  TY.r=String(g.peran||'Guru Matematika|Pengembang Media Interaktif|Penyusun Modul & LKPD').split('|').map(x=>x.trim()).filter(Boolean);if(!TY.s){TY.s=1;typer()}
@@ -31,19 +32,21 @@ function render(){const p=D.profil,g=D.pengaturan||{};
  const lb=String(g.label_hero||'').split('|').map(x=>x.trim());['f1','f2','f3'].forEach((c,i)=>{if(lb[i])$('.'+c).textContent=lb[i]});if(g.footer_teks)$('#ft').textContent=g.footer_teks;if(g.hashtag)$('#ht').textContent=g.hashtag;
  const kw=D.karya.filter(k=>k.jenis=='website').length;
  $('#stats').innerHTML=[[p.tahun+'+','Tahun Pengalaman Mengajar'],[D.karya.length+'+','Karya Edukatif'],[kw+'','Web Interaktif Aktif']].map(s=>`<div class="card stat rv"><b>${esc(s[0])}</b>${esc(s[1])}</div>`).join('');
- const yr=x=>/sekarang/i.test(x)?9999:Math.max(0,...(String(x).match(/\d{4}/g)||[]).map(Number)),R=j=>D.riwayat.filter(r=>r.jenis==j).sort((a,b)=>j=='kompetensi'?a.urutan-b.urutan:yr(b.periode)-yr(a.periode)||a.urutan-b.urutan);
- const tl=(j,t,ic,c)=>{const L=R(j);return`<div class="rv"><div class="th"><span class="ic ${c}">${ic}</span><h3>${t}</h3><small>${L.length}</small></div><div class="tl ${c}">`+L.map(r=>`<div class="ti"><span class="dot"></span><div class="card"><span class="per">${esc(r.periode)}</span><h4>${esc(r.judul)}</h4><p class="ins">${esc(r.instansi)}</p>${r.desk?`<p class="ds">${esc(r.desk)}</p>`:''}</div></div>`).join('')+'</div></div>'};
- $('#riwayat').innerHTML=`<div class="tgrid">${tl('pendidikan','Pendidikan','🎓','p')}${tl('pengalaman','Pengalaman & Organisasi','💼','o')}</div><div class="rv"><div class="th" style="margin-top:56px"><span class="ic b">🧠</span><h3>Kompetensi</h3></div><div class="skills">`+R('kompetensi').map(r=>{const v=Math.min(100,+r.instansi||+r.periode||85);return`<div class="card sk"><div class="ring" style="--v:${v}"><b>${v}%</b></div><h4>${esc(r.judul)}</h4><p class="ds">${esc(r.desk)}</p></div>`}).join('')+'</div></div>';
- $('#kin').innerHTML=`📧 ${esc(p.email)}<br>📍 ${esc(g.lokasi||'Tanjungpinang, Kepulauan Riau')}`;filters();cards();counts();reveal()}
+ riwayat();
+ $('#kin').innerHTML=`📧 ${esc(p.email)}<br>📍 ${esc(g.lokasi||'Tanjungpinang, Kepulauan Riau')}`;notifyNew();filters();cards();counts();reveal();hashOpen()}
 function filters(){const ms=['Semua',...new Set(D.karya.filter(k=>k.jenis==J).map(k=>k.mapel))];$('#mapel').innerHTML=ms.map(m=>`<button class="${m==M?'on':''}">${esc(m)}</button>`).join('')}
 function cards(){const L=D.karya.filter(k=>k.tampil!==false&&k.jenis==J&&(M=='Semua'||k.mapel==M)).sort((a,b)=>a.urutan-b.urutan);
- const B0=k=>{try{const a=JSON.parse(k.berkas||'[]');return Array.isArray(a)?a.filter(f=>safe(f.u)):[]}catch(e){return[]}};
- $('#cards').innerHTML=L.map(k=>{const B=B0(k),w=k.jenis=='website'&&safe(k.tautan),u=!B.length&&safe(k.unduh);return`<article class="card pc rv" data-id="${esc(k.id)}"><div class="sl"></div><div class="pb"><span class="tag">${esc(k.mapel)}</span><h3>${esc(k.judul)}</h3><p>${esc(k.desk)}</p><div class="acts">`+
-  (w?`<a class="btn pri shine" data-t="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(k.tautan)}">Buka Website <i class="ar">→</i></a>`:'')+
-  (B.length>1?`<button class="btn cta shine" data-b="${esc(k.id)}">⬇ Unduh Materi (${B.length})</button>`:B.length?`<a class="btn cta shine" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(B[0].u)}">⬇ Unduh ${esc(extOf(B[0].n))}</a>`:u?`<a class="btn cta shine" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(k.unduh)}">⬇ Unduh</a>`:'')+
-  (!w&&!B.length&&!u?'<small>Segera tersedia</small>':'')+'</div></div></article>'}).join('')||'<p>Belum ada karya.</p>';
+ $('#cards').innerHTML=L.map(k=>{const B=B0(k),id=esc(k.id),w=k.jenis=='website'&&safe(k.tautan),u=!B.length&&safe(k.unduh),nw=isNew(k),dl=fbtn(k,B,u,'cta shine'),
+  main=w?`<a class="btn pri shine wide" data-t="${id}" target="_blank" rel="noopener" href="${esc(k.tautan)}">Buka Website <i class="ar">↗</i></a>`:fbtn(k,B,u,'cta shine wide'),
+  sec=(w&&dl)?fbtn(k,B,u,'out'):`<button class="btn out" data-s="${id}">↗ Bagikan</button>`;
+  return`<article class="card pc rv${nw?' is-new':''}" data-id="${id}"><div class="sl"></div><div class="bd"><span class="bg1"><span class="pill2"><i class="dot2"></i>${esc(k.mapel)}</span>${nw?'<span class="pill2 nw">✨ Baru</span>':''}</span>${k.kelas?`<span class="pill2 kl">${esc(k.kelas)}</span>`:''}</div><div class="pb">${k.subjudul?`<span class="sub">${esc(k.subjudul)}</span>`:''}<h3>${esc(k.judul)}</h3><p>${esc(k.desk)}</p><div class="acts">${main||'<small class="soon">Segera tersedia</small>'}<div class="acts2">${main?sec:''}<button class="btn out" data-d="${id}">ⓘ Detail</button></div></div></div></article>`}).join('')||'<p>Belum ada karya.</p>';
  L.forEach(k=>slideshow($('[data-id="'+k.id+'"] .sl'),cover(k),3000+Math.random()*1500));reveal()}
-document.addEventListener('click',e=>{if(e.target.closest('#upb')){scrollTo({top:0,behavior:'smooth'});return}const b=e.target.closest('button'),a=e.target.closest('a');if(b&&b.dataset.b){openFiles(b.dataset.b);return}
+document.addEventListener('click',e=>{if(e.target.closest('#upb')){scrollTo({top:0,behavior:'smooth'});return}
+ if(e.target.closest('#nbgo')){goNew();return}if(e.target.closest('#nbx')){ackNew();return}
+ const b=e.target.closest('button'),a=e.target.closest('a'),rc=e.target.closest('.rc');if(rc&&!b&&!a){openRiwayat(rc.dataset.r);return}
+ if(b&&b.dataset.b){openFiles(b.dataset.b);return}if(b&&b.dataset.d){openKarya(b.dataset.d);return}if(b&&b.dataset.s){share(b.dataset.s);return}
+ if(b&&b.id=='rmore'){RX=!RX;rgrid();return}
+ if(b&&b.parentNode.id=='rtabs'){RT=b.dataset.t;RX=false;document.querySelectorAll('#rtabs button').forEach(x=>x.classList.toggle('on',x==b));rgrid();return}
  if(b&&b.parentNode.id=='tabs'){J=b.dataset.j;M='Semua';document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x==b));filters();cards()}
  else if(b&&b.parentNode.id=='mapel'){M=b.textContent;filters();cards()}
  if(a&&(a.id=='wa'||a.id=='hire'||/^mailto:/.test(a.getAttribute('href')||'')))track('klik_kontak',a.id||'email');if(a&&a.dataset.t)track('klik_karya',a.dataset.t);if(a&&a.dataset.u)track('unduh_file',a.dataset.u);document.body.classList.remove('menu')});
@@ -73,9 +76,41 @@ function counts(){document.querySelectorAll('.stat b').forEach(b=>{const n=parse
 const EXT={pdf:['PDF','#E5484D'],doc:['DOC','#2B6CD9'],docx:['DOC','#2B6CD9'],ppt:['PPT','#E8691A'],pptx:['PPT','#E8691A'],xls:['XLS','#1E9E5A'],xlsx:['XLS','#1E9E5A'],csv:['CSV','#1E9E5A'],zip:['ZIP','#6B6A80'],rar:['ZIP','#6B6A80'],mp4:['MP4','#B03FD4'],mov:['MP4','#B03FD4'],ggb:['GGB','#3BA7F0'],sb3:['SB3','#FF9F1C'],py:['PY','#3572A5']};
 const fmt=b=>{b=+b;return !b?'':b<1e6?Math.max(1,Math.round(b/1e3))+' KB':b<1e9?(b/1e6).toFixed(1)+' MB':(b/1e9).toFixed(2)+' GB'};
 const extOf=n=>(String(n||'').split('.').pop()||'FILE').toUpperCase().slice(0,4);
-function openFiles(id){const k=D.karya.find(x=>x.id==id);if(!k)return;let B=[];try{B=JSON.parse(k.berkas||'[]').filter(f=>safe(f.u))}catch(e){}const m=document.createElement('div');m.className='mdl';
- m.innerHTML=`<div class="mbox"><button class="mx" aria-label="Tutup">✕</button><h3>${esc(k.judul)}</h3><p>${B.length} berkas materi</p>`+B.map(f=>{const e=(String(f.n).split('.').pop()||'').toLowerCase(),x=EXT[e]||[extOf(f.n),'#7C5CF0'];return`<div class="fr"><div class="fi" style="--c:${x[1]}">${esc(x[0])}</div><div><b>${esc(f.n)}</b><small>${fmt(f.s)}</small></div><a class="btn cta shine" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(f.u)}">Unduh</a></div>`}).join('')+'</div>';
- document.body.appendChild(m);requestAnimationFrame(()=>m.classList.add('in'));const cl=()=>{m.classList.remove('in');setTimeout(()=>m.remove(),250);removeEventListener('keydown',kd)},kd=e=>{if(e.key=='Escape')cl()};m.onclick=e=>{if(e.target==m||e.target.closest('.mx'))cl()};addEventListener('keydown',kd)}
+const B0=k=>{try{const a=JSON.parse(k.berkas||'[]');return Array.isArray(a)?a.filter(f=>safe(f.u)):[]}catch(e){return[]}};
+const fbtn=(k,B,u,c)=>B.length>1?`<button class="btn ${c}" data-b="${esc(k.id)}">⬇ Unduh Materi (${B.length})</button>`:B.length?`<a class="btn ${c}" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(B[0].u)}">⬇ Unduh ${esc(extOf(B[0].n))}</a>`:u?`<a class="btn ${c}" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(k.unduh)}">⬇ Unduh</a>`:'';
+const isNew=k=>{const t=Date.parse(k.dibuat);return !!t&&(Date.now()-t<14*864e5||t>SEEN)};
+// ---- pengalaman & pendidikan: tab + kartu rapi + modal detail
+const yr=x=>/sekarang/i.test(x)?9999:Math.max(0,...(String(x).match(/\d{4}/g)||[]).map(Number)),RL=j=>D.riwayat.filter(r=>r.jenis==j).sort((a,b)=>j=='kompetensi'?a.urutan-b.urutan:yr(b.periode)-yr(a.periode)||a.urutan-b.urutan),RI={pendidikan:'🎓',pengalaman:'💼'};
+function riwayat(){const P=RL('pendidikan'),E=RL('pengalaman');if(!P.length&&E.length)RT='pengalaman';
+ $('#riwayat').innerHTML=`<div class="tabs rtabs" id="rtabs">${[['pendidikan','🎓 Pendidikan',P.length],['pengalaman','💼 Pengalaman & Organisasi',E.length]].map(t=>`<button data-t="${t[0]}" class="${RT==t[0]?'on':''}">${t[1]} <em class="cn">${t[2]}</em></button>`).join('')}</div><div class="rgrid" id="rgrid"></div><div class="rmw" id="rmw"></div><div class="rv"><div class="th" style="margin-top:56px"><span class="ic b">🧠</span><h3>Kompetensi</h3></div><div class="skills">`+RL('kompetensi').map(r=>{const v=Math.min(100,+r.instansi||+r.periode||85);return`<div class="card sk"><div class="ring" style="--v:${v}"><b>${v}%</b></div><h4>${esc(r.judul)}</h4><p class="ds">${esc(r.desk)}</p></div>`}).join('')+'</div></div>';rgrid()}
+function rgrid(){const L=RL(RT);$('#rgrid').innerHTML=L.slice(0,RX?L.length:6).map(r=>`<article class="card rc rv${r.jenis=='pengalaman'?' o':''}" data-r="${esc(r.id)}" tabindex="0"><div class="rt"><span class="per">${esc(r.periode)}</span><span class="ric">${RI[r.jenis]||'⭐'}</span></div><h4>${esc(r.judul)}</h4><p class="ins">${esc(r.instansi)}</p>${r.desk?`<p class="ds">${esc(r.desk)}</p>`:''}<span class="more">Lihat detail <i class="ar">→</i></span></article>`).join('')||'<p>Belum ada data.</p>';
+ $('#rmw').innerHTML=L.length>6?`<button class="btn out" id="rmore">${RX?'Tampilkan lebih sedikit ↑':'Tampilkan semua ('+L.length+') ↓'}</button>`:'';reveal()}
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList&&e.target.classList.contains('rc'))openRiwayat(e.target.dataset.r)});
+// ---- modal bergaya kartu profil
+const HEAD='<div class="mhead">'+['π|8%|30%','∑|24%|62%','{ }|70%|22%','√|84%|58%','∞|45%|18%','+|58%|70%'].map((s,i)=>{const t=s.split('|');return`<span style="left:${t[1]};top:${t[2]};animation-delay:-${i*.9}s">${t[0]}</span>`}).join('')+'</div>';
+const mshell=(av,t,sub,body)=>HEAD+`<div class="mav">${av}</div><div class="mb"><h3>${esc(t)}</h3>${sub?`<p class="msub">${esc(sub)}</p>`:''}${body}</div>`;
+function modal(html,onc){const m=document.createElement('div');m.className='mdl';m.innerHTML=`<div class="mbox">${html}<button class="mx" aria-label="Tutup">✕</button></div>`;document.body.appendChild(m);requestAnimationFrame(()=>m.classList.add('in'));
+ const cl=()=>{m.classList.remove('in');setTimeout(()=>m.remove(),250);removeEventListener('keydown',kd);onc&&onc()},kd=e=>{if(e.key=='Escape')cl()};m.onclick=e=>{if(e.target==m||e.target.closest('.mx')||e.target.closest('a[href^="#"]'))cl()};addEventListener('keydown',kd);return cl}
+function openFiles(id){const k=D.karya.find(x=>x.id==id);if(!k)return;const B=B0(k);
+ modal(mshell('📎',k.judul,B.length+' berkas materi',B.map(f=>{const e=(String(f.n).split('.').pop()||'').toLowerCase(),x=EXT[e]||[extOf(f.n),'#7C5CF0'];return`<div class="fr"><div class="fi" style="--c:${x[1]}">${esc(x[0])}</div><div><b>${esc(f.n)}</b><small>${fmt(f.s)}</small></div><a class="btn cta shine" data-u="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(f.u)}">Unduh</a></div>`}).join('')))}
+function openKarya(id){const k=D.karya.find(x=>x.id==id);if(!k)return;const B=B0(k),w=k.jenis=='website'&&safe(k.tautan),u=!B.length&&safe(k.unduh);try{history.replaceState(null,'','#karya-'+k.id)}catch(e){}
+ modal(mshell(`<img src="${esc(cover(k)[0])}" alt="">`,k.judul,k.subjudul,`${k.desk?`<p class="mdesc">${esc(k.desk)}</p>`:''}<div class="mtags">${[k.mapel,k.kelas,k.jenis=='website'?'Website Interaktif':'Visual Design'].filter(Boolean).map(t=>`<span>${esc(t)}</span>`).join('')}</div><div class="mact">${w?`<a class="btn pri shine" data-t="${esc(k.id)}" target="_blank" rel="noopener" href="${esc(k.tautan)}">Buka Website ↗</a>`:''}${fbtn(k,B,u,'cta shine')}<button class="btn out" data-s="${esc(k.id)}">↗ Bagikan</button></div>`),()=>{try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}})}
+function openRiwayat(id){const r=D.riwayat.find(x=>x.id==id);if(!r)return;
+ modal(mshell(RI[r.jenis]||'⭐',r.judul,r.instansi,`${r.desk?`<p class="mdesc">${esc(r.desk)}</p>`:''}<div class="mtags"><span>${r.jenis=='pendidikan'?'Pendidikan':'Pengalaman'}</span>${r.periode?`<span>${esc(r.periode)}</span>`:''}</div><div class="mact"><a class="btn cta shine" href="#kontak">Hubungi Saya</a></div>`))}
+function pop(t){const p=document.createElement('div');p.className='pop';p.textContent=t;document.body.appendChild(p);requestAnimationFrame(()=>p.classList.add('in'));setTimeout(()=>{p.classList.remove('in');setTimeout(()=>p.remove(),300)},2200)}
+async function share(id){const k=D.karya.find(x=>x.id==id);if(!k)return;const url=location.origin+location.pathname+'#karya-'+k.id;
+ try{if(navigator.share){await navigator.share({title:k.judul,text:k.subjudul||k.mapel,url});return}}catch(e){if(e.name=='AbortError')return}
+ try{await navigator.clipboard.writeText(url);pop('Tautan karya disalin ✔')}catch(e){prompt('Salin tautan:',url)}}
+function hashOpen(){if(DL)return;const h=location.hash.match(/^#karya-([\w-]+)/);if(h&&D.karya.find(x=>x.id==h[1])){DL=1;openKarya(h[1])}}
+// ---- pemberitahuan karya baru untuk pengunjung (terutama yang pernah datang)
+function notifyNew(){let s=0;try{s=+localStorage.getItem('zs_seen')||0}catch(e){}
+ if(!s){try{localStorage.setItem('zs_seen',String(Date.now()))}catch(e){}SEEN=Date.now();return}
+ SEEN=s;NEWL=D.karya.filter(k=>k.tampil!==false&&Date.parse(k.dibuat)>s).sort((a,b)=>Date.parse(b.dibuat)-Date.parse(a.dibuat));NEWN=NEWL.length;let nb=$('#nb');if(!NEWN){nb&&nb.remove();return}
+ if(!nb){nb=document.createElement('div');nb.className='nb';nb.id='nb';nb.setAttribute('role','status');document.body.appendChild(nb);requestAnimationFrame(()=>requestAnimationFrame(()=>nb.classList.add('in')));watchSeen()}
+ nb.innerHTML=`<span class="nbi">✨</span><div><b>${NEWN} karya baru ditambahkan</b><small>Terbaru: ${esc(NEWL[0].judul)}</small></div><button class="btn pri" id="nbgo">Lihat</button><button class="nbx" id="nbx" aria-label="Tutup">✕</button>`}
+function watchSeen(){const c=$('#cards');if(!c||!window.IntersectionObserver)return;let t=0;const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){clearTimeout(t);t=setTimeout(()=>{ackNew();io.disconnect()},3500)}else clearTimeout(t)},{threshold:.35});io.observe(c)}
+function ackNew(){try{localStorage.setItem('zs_seen',String(Date.now()))}catch(e){}NEWN=0;const b=$('#nb');if(b){b.classList.remove('in');setTimeout(()=>b.remove(),400)}}
+function goNew(){const k=NEWL[0];ackNew();if(k){J=k.jenis;M='Semua';document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.j==J));filters();cards()}$('#portofolio').scrollIntoView({behavior:'smooth'})}
 // ripple & magnetic pada tombol
 document.addEventListener('pointerdown',e=>{const b=e.target.closest('.btn');if(!b)return;const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,s=document.createElement('span');s.className='rp';s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;b.appendChild(s);setTimeout(()=>s.remove(),650)});
 if(matchMedia('(hover:hover) and (pointer:fine)').matches){document.addEventListener('pointermove',e=>{const b=e.target.closest&&e.target.closest('.btn.cta,.btn.pri');if(!b)return;const r=b.getBoundingClientRect();b.style.setProperty('--mx',((e.clientX-r.left-r.width/2)*.18)+'px');b.style.setProperty('--my',((e.clientY-r.top-r.height/2)*.28)+'px')});document.addEventListener('pointerout',e=>{const b=e.target.closest&&e.target.closest('.btn');if(b){b.style.removeProperty('--mx');b.style.removeProperty('--my')}})}
@@ -83,10 +118,11 @@ if(matchMedia('(hover:hover) and (pointer:fine)').matches){document.addEventList
 (function(){const L=document.querySelector('link[rel=icon][data-dyn]');if(!L)return;document.querySelectorAll('link[rel=icon]:not([data-dyn])').forEach(n=>n.remove());const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');let f=0,hid=false,TT=document.title;
  function draw(){x.clearRect(0,0,64,64);const t=f/20*Math.PI*2,r=25+Math.sin(t)*2.2,g=x.createLinearGradient(6,6,58,58);g.addColorStop(0,hid?'#FF7A29':'#7C5CF0');g.addColorStop(1,hid?'#FDCB58':'#3BA7F0');x.fillStyle=g;x.beginPath();x.arc(32,32,r,0,7);x.fill();
   x.fillStyle='#fff';x.font='800 34px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(hid?'!':'Z',32,35);
+  if(NEWN>0){x.fillStyle='#fff';x.beginPath();x.arc(50,14,11,0,7);x.fill();x.fillStyle='#FF3B5C';x.beginPath();x.arc(50,14,8,0,7);x.fill()}
   if(SPV>.01&&!hid){x.strokeStyle='#FDCB58';x.lineWidth=6;x.lineCap='round';x.beginPath();x.arc(32,32,29,-Math.PI/2,-Math.PI/2+SPV*Math.PI*2);x.stroke()}
   L.href=c.toDataURL('image/png')}
  setInterval(()=>{f=(f+1)%20;draw()},350);draw();
- document.addEventListener('visibilitychange',()=>{hid=document.hidden;if(hid){TT=document.title;document.title='Yuk lanjut belajar ✨ | ZulfaSpace'}else document.title=TT;draw()})})();
+ document.addEventListener('visibilitychange',()=>{hid=document.hidden;if(hid){TT=document.title;document.title=NEWN?'✨ '+NEWN+' karya baru! | ZulfaSpace':'Yuk lanjut belajar ✨ | ZulfaSpace'}else document.title=TT;draw()})})();
 // ---- init: tampil langsung dari data bawaan, lalu segarkan dari GAS
 let cd=null;try{cd=JSON.parse(localStorage.getItem('zs_d'))}catch(e){}if(cd&&cd.karya&&cd.karya.length)D=cd;
 render();fx();track('kunjungan','beranda');
