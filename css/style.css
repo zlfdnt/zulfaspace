@@ -116,3 +116,9 @@ section[id]{scroll-margin-top:90px}
 .pop{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);opacity:0;background:#1E1B3A;color:#fff;padding:12px 22px;border-radius:999px;z-index:9500;font-weight:600;transition:.3s}.pop.in{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1000px){.rgrid{grid-template-columns:1fr 1fr}}@media(max-width:640px){.rgrid{grid-template-columns:1fr}.nb small{max-width:130px}.acts2{grid-template-columns:1fr 1fr}}
 .pill2{white-space:nowrap}.pill2.kl{flex-shrink:0}.bg1{min-width:0}.bg1 .pill2:first-child{max-width:200px;overflow:hidden;text-overflow:ellipsis}
+
+/* perbaikan: skeleton hanya tampil saat memuat (kelas lain tidak boleh menimpa) */
+.skg{display:none!important}body.skel .skg{display:grid!important}
+/* tautan di dalam deskripsi */
+.lk{color:#2B6CD9;font-weight:600;text-decoration:underline;text-underline-offset:3px;word-break:break-all;transition:color .2s}.lk:hover{color:var(--p)}[data-theme=dark] .lk{color:#8CC4FF}
+.mdesc{white-space:pre-line}.lkc{margin-left:6px;font-weight:600;color:#2B6CD9;font-size:12.5px}

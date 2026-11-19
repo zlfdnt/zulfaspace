@@ -80,5 +80,11 @@ Keamanan: akses butuh dua rahasia (kunci pada alamat + kata sandi), kata sandi h
 - Bagian Pendidikan & Pengalaman kini berupa tab dengan kartu seragam (6 kartu pertama, tombol *Tampilkan semua*); klik kartu untuk membuka detailnya.
 - Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (menambah kolom **kelas, subjudul, dibuat**), lalu Deploy → New version.
 
+## E5. Tautan di dalam deskripsi
+- Tulis alamat lengkap (`https://…`) di kolom Deskripsi Riwayat atau Karya: otomatis menjadi **tautan biru** yang bisa diklik di jendela Detail (dibuka di tab baru).
+- Untuk teks tautan sendiri, tulis `[Lihat materi](https://alamat-anda)`. Di kartu, teks tampil rapi tanpa alamat panjang.
+- Riwayat punya opsi **Tautan khusus** dan **Teks tombol tautan**: tampil sebagai tombol di Detail, dan kartunya diberi tanda 🔗. Hanya alamat `https://` yang diterima.
+- Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (menambah kolom **tautan** dan **label_tautan** di Riwayat), lalu Deploy → New version.
+
 ## F. Yang dikelola dari dashboard
 Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.
