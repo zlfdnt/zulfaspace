@@ -86,5 +86,9 @@ Keamanan: akses butuh dua rahasia (kunci pada alamat + kata sandi), kata sandi h
 - Riwayat punya opsi **Tautan khusus** dan **Teks tombol tautan**: tampil sebagai tombol di Detail, dan kartunya diberi tanda 🔗. Hanya alamat `https://` yang diterima.
 - Setelah menempel `Kode.gs` baru: jalankan `setupAppEnvironment` lagi (menambah kolom **tautan** dan **label_tautan** di Riwayat), lalu Deploy → New version.
 
+## E6. Tampilan ponsel
+- Menu tiga garis membuka panel menu (Beranda, Tentang Saya, Portofolio, Kontak, dan tombol Hire Me); menutup sendiri saat memilih menu atau mengetuk area gelap di luar panel.
+- Karya tampil sebagai kartu yang digeser ke samping (ada penghitung "n / total"), pengalaman sebagai daftar ringkas, dan jendela detail berupa lembar dari bawah yang bisa ditutup dengan menggesernya ke bawah.
+
 ## F. Yang dikelola dari dashboard
 Profil dan foto hero, Riwayat (pendidikan, pengalaman, kompetensi), Karya (judul, kategori, tautan, gambar sampul banyak, file unduhan), Pesan Masuk, Statistik & Laporan, serta Pengaturan situs: judul, deskripsi SEO, warna aksen, status maintenance, lokasi, 3 label di foto hero, daftar keahlian berjalan, teks footer, dan hashtag. Google Sheets tidak perlu dibuka lagi untuk pekerjaan sehari-hari.
